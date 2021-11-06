@@ -9,7 +9,15 @@ const UserType = new GraphQLObjectType({
 	description: 'A user',
 	fields: () => ({
 		id: { type: GraphQLString },
-		name: { type: GraphQLString }
+		name: { type: GraphQLString },
+		company: {
+			type: CompanyType,
+			resolve: ({ company }) => companies.find(c => c.id === company)
+		},
+		projects: {
+			type: new GraphQLList(ProjectType),
+			resolve: (user) => projects.filter(x => user.projects.some(y => x.id == y))
+		}
 	})
 
 });
@@ -39,6 +47,14 @@ const RootType = new GraphQLObjectType({
 	name: "Query",
 	description: "Entrypoint for API",
 	fields: () => ({
+		user: {
+			type: UserType,
+			description: 'A users',
+			args: {
+				id: {type: GraphQLString },
+			},
+			resolve: (parent, args) => users.find(u => u.id === args.id)
+		},
 		users: {
 			type: new GraphQLList(UserType),
 			description: 'List of ALL users',
