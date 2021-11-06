@@ -1,10 +1,11 @@
 import express from 'express';
 import { graphqlHTTP } from "express-graphql";
 import { GraphQLSchema } from 'graphql';
-import { RootType } from './types.js';
+import { RootType, RootMutationType } from './types.js';
 
 const schema = new GraphQLSchema({
-	query: RootType
+	query: RootType,
+	mutation: RootMutationType,
 });
 
 const app = express();

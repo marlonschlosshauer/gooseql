@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLString, GraphQLList } from 'graphql';
+import { v4 as uuid } from 'uuid';
 
 import data from './temp/data.js';
 
@@ -43,6 +44,27 @@ const CompanyType = new GraphQLObjectType({
 
 });
 
+const RootMutationType = new GraphQLObjectType({
+	name: 'Mutation',
+	description: 'Root Muttation',
+	fields: () => ({
+		addUser: {
+			type: UserType,
+			description: 'Add a user',
+			args: {
+				name: { type: GraphQLString },
+				company: { type: GraphQLString },
+				projects: { type: new GraphQLList(GraphQLString) }
+			},
+			resolve: (parent, args) => {
+				const user = { ...args, id: uuid() }
+				users.push(user);
+				return user;
+			}
+		}
+	})
+})
+
 const RootType = new GraphQLObjectType({
 	name: "Query",
 	description: "Entrypoint for API",
@@ -51,7 +73,7 @@ const RootType = new GraphQLObjectType({
 			type: UserType,
 			description: 'A users',
 			args: {
-				id: {type: GraphQLString },
+				id: { type: GraphQLString },
 			},
 			resolve: (parent, args) => users.find(u => u.id === args.id)
 		},
@@ -73,4 +95,4 @@ const RootType = new GraphQLObjectType({
 	})
 });
 
-export { UserType, ProjectType, RootType };
+export { UserType, ProjectType, RootType, RootMutationType };
