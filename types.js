@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString, GraphQLList } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNonNull } from 'graphql';
 import { v4 as uuid } from 'uuid';
 
 import data from './temp/data.js';
@@ -9,7 +9,7 @@ const UserType = new GraphQLObjectType({
 	name: 'User',
 	description: 'A user',
 	fields: () => ({
-		id: { type: GraphQLString },
+		id: { type: GraphQLNonNull(GraphQLString) },
 		name: { type: GraphQLString },
 		company: {
 			type: CompanyType,
@@ -27,7 +27,7 @@ const ProjectType = new GraphQLObjectType({
 	name: 'Project',
 	description: 'A project by a company',
 	fields: () => ({
-		id: { type: GraphQLString },
+		id: { type: GraphQLNonNull(GraphQLString) },
 		name: { type: GraphQLString },
 		company: { type: GraphQLString },
 	})
@@ -38,7 +38,7 @@ const CompanyType = new GraphQLObjectType({
 	name: 'Company',
 	description: 'A company',
 	fields: () => ({
-		id: { type: GraphQLString },
+		id: { type: GraphQLNonNull(GraphQLString) },
 		name: { type: GraphQLString },
 	})
 
@@ -52,18 +52,14 @@ const RootMutationType = new GraphQLObjectType({
 			type: UserType,
 			description: 'Add a user',
 			args: {
-				name: { type: GraphQLString },
-				company: { type: GraphQLString },
+				name: { type: GraphQLNonNull(GraphQLString) },
+				company: { type: GraphQLNonNull(GraphQLString) },
 				projects: { type: new GraphQLList(GraphQLString) }
 			},
-			resolve: (parent, args) => {
-				const user = { ...args, id: uuid() }
-				users.push(user);
-				return user;
-			}
+			resolve: (parent, { name, company, projects }) => users[users.push({ name, company, projects: projects ?? [], id: uuid() }) - 1]
 		}
 	})
-})
+});
 
 const RootType = new GraphQLObjectType({
 	name: "Query",
